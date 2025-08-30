@@ -144,7 +144,7 @@
 
         f. Login to Argo CD from command line
 
-            argocd login localhost:8080 --username admin --password 9ySYEhIbhV8VB8Av --insecure    
+            argocd login localhost:8080 --username admin --password 7zIeQmeAEuHMCzdI --insecure    
         
         g. Add Git Repository to Argo CD
 
