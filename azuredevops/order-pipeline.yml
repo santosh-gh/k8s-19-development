@@ -65,4 +65,5 @@ stages:
 
             git add .
             git commit -m "Updated $(imageName) with Tag: $(imageTag)"
-            git push origin HEAD:main
+            git push origin https://$(GITHUB-PAT)@github.com/santosh-gh/k8s-19-deployment.git HEAD:main
+           
