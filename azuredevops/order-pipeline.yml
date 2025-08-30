@@ -8,8 +8,6 @@ pool:
 
 variables:
 - group: 'k8s-dev'
-- name: chartName 
-  value: 'storehelmchart'
 - name: imageTag
   value: $(Build.BuildId)
 - name: imageName
