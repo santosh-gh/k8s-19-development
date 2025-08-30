@@ -50,7 +50,7 @@ stages:
           targetType: inline
           script: |
             git config --global user.email "santosh.mohapatra25@gmail.com"
-            git config --global user.name "Santosh Mohapatra"
+            git config --global user.name "santosh-gh"
             git clone https://github.com/santosh-gh/k8s-19-deployment.git
             cd k8s-19-deployment
             git checkout main
