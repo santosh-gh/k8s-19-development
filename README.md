@@ -197,6 +197,10 @@
     HelmChart
     Argo CD
 
+# Pipeline and Argo CD
+
+![Pipeline](argo.PNG)
+
 # Steps
 
     1. Infra deployment using AzCLI/Bicep command line 
