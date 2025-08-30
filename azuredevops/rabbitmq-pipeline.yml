@@ -13,7 +13,6 @@ variables:
 stages:
   - stage: UpdateGitOps
     displayName: Update GitOps Repo (image tag)
-    dependsOn: Build
     jobs:
     - job: UpdateGitOpsRepo
       displayName: Update GitOps Repo
