@@ -63,6 +63,8 @@ stages:
             # Update env values file (YQ preferred, but sed works if format is stable)        
             sed -i 's/\(tag:\s*\).*/\1$(imageTag)/' multi-helmchart/$(imageName)/values.yaml
 
+            echo "Pipeline run at $(date)" >> pipeline-log.txt
+
             git add .
             git commit -m "Updated $(imageName) with Tag: $(imageTag)"
             git push https://$(GITHUB-PAT)@github.com/santosh-gh/k8s-19-deployment.git HEAD:main
