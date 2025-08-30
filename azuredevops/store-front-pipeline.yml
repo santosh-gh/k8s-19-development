@@ -1,7 +1,7 @@
 trigger:
   paths:
     include:
-      - app/store-front-service/**
+      - app/store-front/**
 
 pool:
   vmImage: 'ubuntu-latest'
