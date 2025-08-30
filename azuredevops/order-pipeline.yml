@@ -14,27 +14,27 @@ variables:
   value: 'order'
 
 stages:
-  - stage: Build
-    displayName: Build and Publish
-    jobs:
-      - job: BuildPublishDockerImages
-        displayName: Build Publish Docker Images
-        steps:
-          - task: DockerInstaller@0
-            displayName: Install Docker
-            inputs:
-              dockerVersion: '17.09.0-ce'
+  # - stage: Build
+  #   displayName: Build and Publish
+  #   jobs:
+  #     - job: BuildPublishDockerImages
+  #       displayName: Build Publish Docker Images
+  #       steps:
+  #         - task: DockerInstaller@0
+  #           displayName: Install Docker
+  #           inputs:
+  #             dockerVersion: '17.09.0-ce'
 
-          - template: appTemplates/build.yml
-            parameters:
-              acrServiceConnection: $(acrServiceConnection)
-              imageName: $(imageName)
-              dockerFilePath: '$(Build.sourcesdirectory)/app/order-service/Dockerfile'
-              tag: $(imageTag)
+  #         - template: appTemplates/build.yml
+  #           parameters:
+  #             acrServiceConnection: $(acrServiceConnection)
+  #             imageName: $(imageName)
+  #             dockerFilePath: '$(Build.sourcesdirectory)/app/order-service/Dockerfile'
+  #             tag: $(imageTag)
 
   - stage: UpdateGitOps
     displayName: Update GitOps Repo (image tag)
-    dependsOn: Build
+    #dependsOn: Build
     jobs:
     - job: Update
       # pool:
@@ -65,5 +65,5 @@ stages:
 
             git add .
             git commit -m "Updated $(imageName) with Tag: $(imageTag)"
-            git push origin https://$(GITHUB-PAT)@github.com/santosh-gh/k8s-19-deployment.git HEAD:main
+            git push https://$(GITHUB-PAT)@github.com/santosh-gh/k8s-19-deployment.git HEAD:main
            
