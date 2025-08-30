@@ -44,9 +44,9 @@ stages:
         persistCredentials: true
         clean: true
 
-      - checkout: git://git@github.com/santosh-gh/k8s-19-development.git
-        persistCredentials: true
-        clean: true
+      # - checkout: git://git@github.com/santosh-gh/k8s-19-development.git
+      #   persistCredentials: true
+      #   clean: true
 
 
       - task: Bash@3
