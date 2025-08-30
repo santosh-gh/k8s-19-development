@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- group: 'k8s-dev'
+- group: 'k8s-common'
 - name: imageTag
   value: $(Build.BuildId)
 - name: imageName
