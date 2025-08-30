@@ -44,6 +44,11 @@ stages:
         persistCredentials: true
         clean: true
 
+      - checkout: https://github.com/santosh-gh/k8s-19-development.git
+        persistCredentials: true
+        clean: true
+
+
       - task: Bash@3
         displayName: Clone GitOps repo
         inputs:
