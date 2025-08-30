@@ -29,7 +29,7 @@ stages:
             parameters:
               acrServiceConnection: $(acrServiceConnection)
               imageName: $(imageName)
-              dockerFilePath: '$(Build.sourcesdirectory)/app/storefront/Dockerfile'
+              dockerFilePath: '$(Build.sourcesdirectory)/app/store-front/Dockerfile'
               tag: $(imageTag)
 
   - stage: UpdateGitOps
