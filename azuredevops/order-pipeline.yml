@@ -57,13 +57,10 @@ stages:
             git config --global user.email "santosh.mohapatra25@gmail.com"
             git config --global user.name "Santosh Mohapatra"
             git clone https://github.com/santosh-gh/k8s-19-deployment.git
-            cd k8s-19-deployment
-            git checkout main
+            cd k8s-19-deployment       
             
             # Update env values file (YQ preferred, but sed works if format is stable)        
-            sed -i 's/\(tag:\s*\).*/\1$(imageTag)/' multi-helmchart/$(imageName)/values.yaml
-
-            echo "Pipeline run at $(date)" >> pipeline-log.txt
+            sed -i 's/\(tag:\s*\).*/\1$(imageTag)/' multi-helmchart/$(imageName)/values.yaml            
 
             git add .
             git commit -m "Updated $(imageName) with Tag: $(imageTag)"
