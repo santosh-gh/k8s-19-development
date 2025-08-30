@@ -144,7 +144,16 @@
 
         f. Login to Argo CD from command line
 
-            argocd login localhost:8080 --username admin --password <output from step d> --insecure    
+            argocd login localhost:8080 --username admin --password 9ySYEhIbhV8VB8Av --insecure    
+        
+        g. Add Git Repository to Argo CD
+
+            argocd repo add https://github.com/santosh-gh/k8s-19-deployment.git \
+            --username santosh-gh \
+            --password GitHub@2025 --insecure-skip-server-verification
+
+            argocd repo add https://github.com/santosh-gh/k8s-19-deployment.git
+
 
     2. Run CI Pipelines
 
