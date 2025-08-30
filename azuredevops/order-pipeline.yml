@@ -40,7 +40,9 @@ stages:
       # pool:
       #   vmImage: 'ubuntu-latest'
       steps:
-      - checkout: none
+      - checkout: self
+        persistCredentials: true
+        
       - task: Bash@3
         displayName: Clone GitOps repo
         inputs:
