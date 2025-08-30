@@ -75,139 +75,96 @@
     AKS
     ACR
     HelmChart
-    Helmify
+    Argo CD
 
 # Steps
 
-    1. Infra deployment using AzCLI/Bicep command line or 
+    1. Infra deployment using AzCLI/Bicep command line 
+       OR 
        Pipelines azcli-infra-pipeline.yml/bicep-infra-pipeline.yml
 
-    2. Build and push images to ACR: CI Pipelines
-       order-pipeline.yml, product-pipeline.yml, store-front-pipeline.yml
+       Infra deployment using AzCLI command line
 
-    3. Helm install and Helmfy
-       https://helm.sh/docs/intro/install/
+        a. Login to Azure
 
-       https://github.com/arttor/helmify/releases
+            az login
+            az account set --subscription=<subscriptionId>
+            az account show
 
-       Advantages of helm over kubectl
+        b. Show existing resources
 
-       Helm uses templates with variables, so no need to duplicate YAML files for each environment
+            az resource list
 
-       Helm supports versioned releases and can be roll back to a previous release easily
+        c. Create RG, ACR and AKS
 
-       helm list
-       helm rollback online-store 1
+            # AzCLI
+            ./infra/azcli/script.sh
 
-       Parameterization per Environment using enverionment  specific values.yaml
-       helm install online-store ./helmchart -f dev-values-.yaml
-       helm install online-store ./helmchart -f test-values.yaml
+            OR
 
-       Helm keeps track of installed releases, values, and history
-       helm list
-       helm get all online-store
+            # Bicep
+            az deployment sub create --location uksouth --template-file ./infra/bicep/main.bicep --parameters ./infra/bicep/main.bicepparam
 
-    4. App deployment: CD Pipelines
-       app-deploy-pipeline.yml
+        d. Connect to cluster
+
+            RESOURCE_GROUP="rg-onlinestore-dev-uksouth-001"
+            AKS_NAME="aks-onlinestore-dev-uksouth-001"
+            az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_NAME --overwrite-existing           
+
+        e. Short name for kubectl
+
+            alias k=kubectl
+
+        d. Show all existing objects
+
+            k get all
+
+    2. Install and Access Argo CD
+
+        a. Create namespace for Argo CD
+
+            kubectl create namespace argocd
+
+        b. Install Argo CD
+
+            kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+        c. Expose Argo CD API server
+
+            kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+        d. Get initial admin password
+
+            kubectl get secret argocd-initial-admin-secret -n argocd \
+              -o jsonpath="{.data.password}" | base64 -d; echo
+
+        e. Browse and Login
+
+            https://localhost:8080/
+
+        f. Login to Argo CD from command line
+
+            argocd login localhost:8080 --username admin --password <output from step d> --insecure    
+
+    2. Run CI Pipelines
+
+            config.yml
+            rabbitmq.yml
+            order-pipeline.yml
+            product-pipeline.yml
+            store-front-pipeline.yml
+
+        a. Build and push images to ACR
+           
+        b. Upadate image tag with Build Id
+
+        c. Update Helm values.yaml in GitOps repository (k8s-19-deployment) 
+           
+           Argo CD will pull the images from ACR and deploy into AKS
 
     5. Validate and Access the application
 
     6. Clean the Azure resources
-    
-# Infra deployment
-
-    # Login to Azure
-
-        az login
-        az account set --subscription=<subscriptionId>
-        az account show
-
-    # Show existing resources
-
-        az resource list
-
-    # Create RG, ACR and AKS
-
-        # AzCLI
-        ./infra/azcli/script.sh
-
-        OR
-
-        # Bicep
-        az deployment sub create --location uksouth --template-file ./infra/bicep/main.bicep --parameters ./infra/bicep/main.bicepparam
-
-    # Connect to cluster
-
-        RESOURCE_GROUP="rg-onlinestore-dev-uksouth-001"
-        AKS_NAME="aks-onlinestore-dev-uksouth-001"
-        az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_NAME --overwrite-existing
-
-        alias k=kubectl
-
-    # Short name for kubectl
-
-    # Show all existing objects
-
-        k get all   
-
-
-# Docker Build and Push
-
-    # Log in to ACR
-
-        ACR_NAME="acronlinestoredevuksouth001"
-        az acr login --name $ACR_NAME
-
-    # Build and push the Docker images to ACR
-
-        # Order Service
-        docker build -t order ./app/order-service 
-        docker tag order:latest $ACR_NAME.azurecr.io/order:v1
-        docker push $ACR_NAME.azurecr.io/order:v1
-
-        # Product Service
-        docker build -t product ./app/product-service 
-        docker tag product:latest $ACR_NAME.azurecr.io/product:v1
-        docker push $ACR_NAME.azurecr.io/product:v1
-
-        # Store Front Service
-        docker build -t store-front ./app/store-front 
-        docker tag store-front:latest $ACR_NAME.azurecr.io/store-front:v1
-        docker push $ACR_NAME.azurecr.io/store-front:v1
-
-        docker images
-
-
-# Helm and Helmify
-
-    # helmify
-
-    helmify -f ./manifests/order ./storehelmchart/order
-
-    helmify -f ./manifests/product ./storehelmchart/product
-
-    helmify -f ./manifests/store-front ./storehelmchart/store-front
-
-    helmify -f ./manifests/rabbitmq ./storehelmchart/rabbitmq
-
-    helmify -f ./manifests/config ./storehelmchart/config
-
-    # Helm Deploy
-
-    helm install config ./storehelmchart/config -n dev
-    helm install rabbitmq ./storehelmchart/rabbitmq -n dev
-    helm install order ./storehelmchart/order -n dev
-    helm install product ./storehelmchart/product -n dev
-    helm install store-front ./storehelmchart/store-front -n dev
-   
-
-    # Delete Services using helm        
-     
-    helm uninstall order
-    helm uninstall product
-    helm uninstall store-front
-    helm uninstall rabbitmq
-    helm uninstall config
 
 # Verify the Deployment
 
@@ -219,25 +176,3 @@
 # Clean the Azure resources
 
     az group delete --name rg-onlinestore-dev-uksouth-001 --yes --no-wait
-
-
-
-    k apply -f ./manifests/config -n dev
-    k apply -f ./manifests/rabbitmq -n dev
-    k apply -f ./manifests/order -n dev
-    k apply -f ./manifests/product -n dev
-    k apply -f ./manifests/store-front -n dev
-
-
-    k apply -f ./manifests/config -n test
-    k apply -f ./manifests/rabbitmq -n test
-    k apply -f ./manifests/order -n test
-    k apply -f ./manifests/product -n test
-    k apply -f ./manifests/store-front -n test
-
-    k apply -f ./manifests/config -n prod
-    k apply -f ./manifests/rabbitmq -n prod
-    k apply -f ./manifests/order -n prod
-    k apply -f ./manifests/product -n prod
-    k apply -f ./manifests/store-front -n prod
-

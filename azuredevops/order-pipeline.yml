@@ -50,44 +50,13 @@ stages:
           script: |
             git config --global user.email "santosh.mohapatra25@gmail.com"
             git config --global user.name "Santosh Mohapatra"
-            git clone https://$(GITOPS_SC)@your.git/organization/gitops.git
-            cd gitops
-            git checkout -b update-$(IMAGE_NAME)-$(Build.BuildId) || git checkout -b update-$(IMAGE_NAME)-$(Build.BuildId)
-            # Update env values file (YQ preferred, but sed works if format is stable)
-            # Example: replace tag in envs/prod/service-a-values.yaml
-            sed -i "s/^  tag: .*/  tag: \"$(Build.SourceVersion)\"/" envs/prod/service-a-values.yaml
+            git clone https://github.com/santosh-gh/k8s-19-deployment.git
+            cd k8s-19-deployment
+            git checkout main
+            
+            # Update env values file (YQ preferred, but sed works if format is stable)        
+            sed -i 's/\(tag:\s*\).*/\1$(imageTag)/' multi-helmchart/$(imageName)/values.yaml
 
-            git add envs/prod/service-a-values.yaml
-            git commit -m "chore: $(IMAGE_NAME) -> $(Build.SourceVersion)"
-            git push --set-upstream origin update-$(IMAGE_NAME)-$(Build.BuildId)
-
-  - stage: Deploy
-    jobs:
-    - deployment: DeployAKS
-      displayName: Deploy AKS
-      environment: $(environment)
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - download: current
-                artifact: $(chartName)
-
-              - script: |
-                  echo "Workspace Directory: $(Pipeline.Workspace)"
-                  ls -R "$(Pipeline.Workspace)"
-
-              - task: AzureCLI@2
-                displayName: Get AKS Credentials
-                inputs:
-                  azureSubscription: $(serviceConnection)
-                  scriptType: bash
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    echo "Getting AKS credentials..."
-                    az aks get-credentials --name $(aksCluster) --resource-group $(aksResourceGroup) --overwrite-existing
-
-                    echo "Updating image tag in values.yaml..."
-                    sed -i 's/\(tag:\s*\).*/\1$(imageTag)/' $(Pipeline.Workspace)/$(chartName)/order/values.yaml
-                    echo "Updated values.yaml:"
-                    cat $(Pipeline.Workspace)/$(chartName)/order/values.yaml
+            git add .
+            git commit -m "Updated $(imageName) with Tag: $(imageTag)"
+            git push origin main
