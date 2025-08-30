@@ -42,7 +42,8 @@ stages:
       steps:
       - checkout: self
         persistCredentials: true
-        
+        clean: true
+
       - task: Bash@3
         displayName: Clone GitOps repo
         inputs:
@@ -59,4 +60,4 @@ stages:
 
             git add .
             git commit -m "Updated $(imageName) with Tag: $(imageTag)"
-            git push origin main
+            git push origin HEAD:main
