@@ -8,24 +8,25 @@ variables:
 
 stages:  
   - stage: UpdateGitOps
-    displayName: Update GitOps Repo (image tag)    
+    displayName: Update GitOps Repo
     jobs:
-    - job: Update
-      # pool:
-      #   vmImage: 'ubuntu-latest'
+    - job: UpdateGitOpsRepo
+      displayName: Update GitOps Repo
       steps:
-      - checkout: none
+      - checkout: self
+        persistCredentials: true
+        clean: true
+
       - task: Bash@3
-        displayName: Clone GitOps repo
+        displayName: Update GitOps Repo
         inputs:
           targetType: inline
           script: |
             git config --global user.email "santosh.mohapatra25@gmail.com"
             git config --global user.name "Santosh Mohapatra"
             git clone https://github.com/santosh-gh/k8s-19-deployment.git
-            cd k8s-19-deployment
-            git checkout main
-            
+            cd k8s-19-deployment 
+
             git add .
-            git commit -m "Updated "
-            git push origin main
+            git commit -m "Updated $(imageName) with Tag: $(imageTag)"
+            git push https://$(GITHUB-PAT)@github.com/santosh-gh/k8s-19-deployment.git HEAD:main
